@@ -2,8 +2,21 @@ const express = require('express');
 const shipping = require('./shipping');
 const inventory = require('./inventory');
 const cors = require('cors');
-
+const grpc = require('@grpc/grpc-js');
+const protoLoader = require('@grpc/proto-loader');
+const path = require('path');
+const discountPackageDef = protoLoader.loadSync(path.join(__dirname, '../../proto/discount.proto'));
+const discountProto = grpc.loadPackageDefinition(discountPackageDef).discount;
 const app = express();
+
+// Serve o frontend
+app.use(express.static(path.join(__dirname, '../frontend')));
+
+const discountClient = new discountProto.DiscountService(
+  'localhost:3003',
+  grpc.credentials.createInsecure()
+);
+
 app.use(cors());
 
 /**
@@ -57,6 +70,27 @@ app.get('/product/:id', (req, res, next) => {
             res.json(product);
         }
     });
+});
+
+app.get('/discount/:price/:percent', (req, res) => {
+  const { price, percent } = req.params;
+
+  discountClient.CalculateDiscount(
+    { price: parseFloat(price), percent: parseFloat(percent) },
+    (err, response) => {
+      if (err) {
+        console.error(err);
+        res.status(500).json({ error: 'something failed :(' });
+      } else {
+        res.json(response);
+      }
+    }
+  );
+});
+
+// Rota padrão (para index.html)
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
 /**
