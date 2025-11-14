@@ -13,7 +13,7 @@ const app = express();
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 const discountClient = new discountProto.DiscountService(
-  'localhost:3003',
+  'discount:3003', // antes estava 'localhost:3003'
   grpc.credentials.createInsecure()
 );
 

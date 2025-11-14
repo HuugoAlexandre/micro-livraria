@@ -1,0 +1,52 @@
+# docker-compose.yml (VERSÃO CORRIGIDA)
+
+version: '3.8'
+
+services:
+  # 1. O API Gateway (Express)
+  controller:
+    build: .
+    command: npm run start-controller
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - inventory
+      - shipping
+      - discount
+
+  # 2. O Frontend (Servido com 'serve')
+  frontend:
+    build: .
+    command: npm run start-frontend
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+  # 3. Serviço gRPC de Inventário
+  inventory:
+    build: .
+    command: npm run start-inventory
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+  # 4. Serviço gRPC de Frete
+  shipping:
+    build: .
+    command: npm run start-shipping
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+  # 5. Serviço gRPC de Desconto
+  discount:
+    build: .
+    command: npm run start-discount
+    volumes:
+      - .:/app
+      - /app/node_modules

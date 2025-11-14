@@ -17,6 +17,6 @@ server.addService(discountProto.DiscountService.service, { // <- serviço "Disco
 });
 
 server.bindAsync('0.0.0.0:3003', grpc.ServerCredentials.createInsecure(), () => {
-  console.log('Discount Service running at http://127.0.0.1:3003');
+  console.log('Discount Service running on port 3003');
   server.start();
 });
